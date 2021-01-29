@@ -108,11 +108,22 @@ class TestCostCalculation:
         start_time = time.time()
         err, npc, cost = get_name_puzzle_conditions(program, False)
         end_time = time.time()
-        duration = end_time - start_time
+        python_duration = end_time - start_time
         assert err is None
         assert len(npc) == 687
+        print ("Python duration: {python_duration}")
+
+        start_time = time.time()
+        err, npc, cost = get_name_puzzle_conditions(program, False, "rust")
+        end_time = time.time()
+        rust_duration = end_time - start_time
+        assert err is None
+        assert len(npc) == 687
+        print ("Rust duration: {rust_duration}")
+
         # TODO make this instant
         assert duration < 150
+        assert rust_duration < 150
 
     @pytest.mark.asyncio
     async def test_standard_tx(self):

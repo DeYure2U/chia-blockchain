@@ -12,6 +12,10 @@ from clvm.EvalError import EvalError
 
 from clvm_tools.curry import curry, uncurry
 
+try:
+    from clvm_rs import serialize_and_run_program
+except ImportError:
+    serialize_and_run_program = None
 
 def run_program(
     program,
@@ -37,6 +41,7 @@ class Program(SExp):
     """
     A thin wrapper around s-expression data intended to be invoked with "eval".
     """
+    MAX_COST = 0
 
     @classmethod
     def parse(cls, f):
@@ -80,12 +85,21 @@ class Program(SExp):
         """
         return self._tree_hash(set(args))
 
-    def run_with_cost(self, args) -> Tuple[int, "Program"]:
-        prog_args = Program.to(args)
-        return run_program(self, prog_args)
+    def run_with_cost(self, args, backend=None) -> Tuple[int, "Program"]:
+        if backend == "rust":
+            cost, r = serialize_and_run_program(self.as_bin(), args, 1 , 3, self.MAX_COST)
+            r = sexp_from_stream(io.BytesIO(r), to_sexp_f)
+            return cost, r
+        else:
+            prog_args = Program.to(args)
+            return run_program(self, prog_args)
 
-    def run(self, args) -> "Program":
-        cost, r = self.run_with_cost(args)
+    def run(self, args, backend=None) -> "Program":
+        if backend == "rust":
+            cost, r = serialize_and_run_program(self.as_bin(), args, 1 , 3, self.MAX_COST)
+            #r = sexp_from_stream(io.BytesIO(r), to_sexp_f)
+        else:
+            cost, r = self.run_with_cost(args)
         return Program.to(r)
 
     def curry(self, *args) -> "Program":

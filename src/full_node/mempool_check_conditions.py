@@ -96,12 +96,12 @@ def mempool_assert_relative_time_exceeds(condition: ConditionVarPair, unspent: C
     return None
 
 
-def get_name_puzzle_conditions(block_program: Program, safe_mode: bool):
+def get_name_puzzle_conditions(block_program: Program, safe_mode: bool, backend=None):
     # TODO: allow generator mod to take something (future)
     # TODO: check strict mode locations are set correctly
     # TODO: write various tests
     try:
-        cost, result = GENERATOR_MOD.run_with_cost(block_program)
+        cost, result = GENERATOR_MOD.run_with_cost(block_program, backend)
         npc_list = []
         opcodes = set(item.value for item in ConditionOpcode)
         for res in result.as_iter():
@@ -133,9 +133,9 @@ def get_name_puzzle_conditions(block_program: Program, safe_mode: bool):
         return tb, None, None
 
 
-def get_puzzle_and_solution_for_coin(block_program: Program, coin_name: bytes):
+def get_puzzle_and_solution_for_coin(block_program: Program, coin_name: bytes, backend=None):
     try:
-        cost, result = GENERATOR_FOR_SINGLE_COIN_MOD.run_with_cost([block_program, coin_name])
+        cost, result = GENERATOR_FOR_SINGLE_COIN_MOD.run_with_cost([block_program, coin_name], backend)
         puzzle = result.first()
         solution = result.rest().first()
         return None, puzzle, solution
