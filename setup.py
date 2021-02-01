@@ -8,6 +8,7 @@ dependencies = [
     "chiabip158==0.17",  # bip158-style wallet filters
     "chiapos==0.12.42b2",  # proof of space
     "clvm==0.7",
+    "clvm_rs>=0.1.0",
     "clvm_tools==0.2.0",
     "clvm_rs_test>=0.1.0",
     "aiohttp==3.7.3",  # HTTP server for full node rpc
