@@ -12,10 +12,7 @@ from clvm.EvalError import EvalError
 
 from clvm_tools.curry import curry, uncurry
 
-try:
-    from clvm_rs import serialize_and_run_program
-except ImportError:
-    serialize_and_run_program = None
+from clvm_rs import serialize_and_run_program
 
 
 def run_program(
