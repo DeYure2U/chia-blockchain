@@ -48,7 +48,7 @@ class Program(SExp):
         sexp_to_stream(self, f)
 
     @classmethod
-    def from_bytes(cls, blob: bytes) -> Any:
+    def from_bytes(cls, blob: bytes) -> "Program":
         f = io.BytesIO(blob)
         return cls.parse(f)  # type: ignore # noqa
 
