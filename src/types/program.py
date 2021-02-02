@@ -7,7 +7,7 @@ from src.util.hash import std_hash
 from clvm import run_program as default_run_program, KEYWORD_TO_ATOM, SExp
 from clvm.casts import int_from_bytes
 from clvm.operators import OPERATOR_LOOKUP
-from clvm.serialize import sexp_from_stream, sexp_to_stream
+from clvm.serialize import sexp_from_stream, sexp_buffer_from_stream, sexp_to_stream
 from clvm.EvalError import EvalError
 
 from clvm_tools.curry import curry, uncurry
@@ -131,8 +131,8 @@ class SerializedProgram:
 
     @classmethod
     def parse(cls, f) -> "SerializedProgram":
-        tmp = sexp_from_stream(f, SExp.to)
-        return SerializedProgram.from_bytes(tmp.as_bin())
+        tmp = sexp_buffer_from_stream(f)
+        return SerializedProgram.from_bytes(tmp)
 
     def stream(self, f):
         f.write(self._buf)
@@ -154,9 +154,6 @@ class SerializedProgram:
         Any values in `args` that appear in the tree
         are presumed to have been hashed already.
         """
-        print(self._buf)
-        print(type(self._buf))
-        assert type(self._buf) == bytes
         tmp = sexp_from_stream(io.BytesIO(self._buf), SExp.to)
         return _tree_hash(tmp, set(args))
 
@@ -169,6 +166,7 @@ class SerializedProgram:
             prog_args = SExp.to(args).as_bin()
         max_cost = 0
         cost, ret = serialize_and_run_program(self._buf, prog_args, 1, 3, max_cost)
+        # TODO this could be parsed lazily
         return cost, sexp_from_stream(io.BytesIO(ret), SExp.to)
 
     def run(self, args) -> "Program":
