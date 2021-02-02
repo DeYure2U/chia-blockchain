@@ -1,5 +1,5 @@
 import io
-from typing import Any, List, Optional, Set, Tuple
+from typing import List, Optional, Set, Tuple
 
 from src.types.sized_bytes import bytes32
 from src.util.hash import std_hash
